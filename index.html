@@ -11,7 +11,21 @@
 			<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 
 			<script type="text/javascript">
+				var map = null;
+				var lineSymbol = null;
+				function createPathPolyline(path, color) {
+					
+				}
+				
 				function initialize() {
+					var heartOfVenice = new google.maps.LatLng(45.4375315,12.3284537);
+					var myOptions = {
+						zoom: 5,
+						center: heartOfVenice,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					this.map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+					
 					var bronzeHorsePath = [
 						new google.maps.LatLng(41.0148235,28.977071),
 						new google.maps.LatLng(45.434805,12.340067),
@@ -24,15 +38,9 @@
 						new google.maps.LatLng(50.088003,14.42175)
 					];
 					
-					var myOptions = {
-						zoom: 5,
-						center: bronzeHorsePath[3],
-						mapTypeId: google.maps.MapTypeId.ROADMAP
-					};
-					var map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 
 
-					var lineSymbol = {
+					this.lineSymbol = {
 						path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
 						strokeColor: '#FF0000',
 						strokeOpacity: 1.0
