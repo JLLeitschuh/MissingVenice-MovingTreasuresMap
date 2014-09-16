@@ -14,6 +14,7 @@
 		<script src="js/foundation/foundation.js"></script>
 		<script src="js/foundation/foundation.slider.js"></script>
 		
+		
 		<script type="text/javascript">
 			var map = null;
 			var lineSymbol = null;
@@ -51,12 +52,45 @@
 					map.setZoom(14);
 				});
 			}
+			/**
+			 *<!--div id="slider">
+			 *	 <input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
+			 *	 <span class="highlight"></span>
+			 *	 <output id="rangevalue">2014</output>
+			 *</div-->
+			*/
 			
 			function TimeLineSlider(controlDiv, map){
-				controlDiv.style.padding = '5px';
+				
+				var timeLineUI = document.createElement('div');
+				timeLineUI.id = 'slider';
+				
+				var timeLineInput = document.createElement('input');
+				
+				// This is declared here so that it can be used in the 'onchange' funciton callback
+				var timeLineOutput = document.createElement('output');
+				
+				timeLineInput.className = 'bar';
+				timeLineInput.type = 'range';
+				timeLineInput.name = 'dates';
+				timeLineInput.min ='500';
+				timeLineInput.max = '2014';
+				timeLineInput.id = 'rangeinput';
+				timeLineInput.value= '2014';
+				timeLineInput.onchange = function(){
+					timeLineOutput.value = timeLineInput.value;
+				};
+				timeLineUI.appendChild(timeLineInput);
+
+				var timeLineSpan = document.createElement('span');
+				timeLineSpan.className = 'highlight';
+				timeLineUI.appendChild(timeLineSpan);
+				
+				timeLineOutput.id = 'rangevalue';
+				timeLineOutput.value = '2014';
+				timeLineUI.appendChild(timeLineOutput);
 				
 				
-				var timeLineUI = document.getElementById('slider');
 				try{
 					//Temporary fix to get the github io to display the page correctly
 					controlDiv.appendChild(timeLineUI);
@@ -144,11 +178,6 @@
 		</script>
 	</head>
 	<body>
-		<div id="slider">
-			<input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
-			<span class="highlight"></span>
-			<output id="rangevalue">2014</output>
-		</div>
 		<div id="map-canvas"></div>
 	</body>
 </html>
