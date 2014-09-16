@@ -14,12 +14,6 @@
 		<script src="js/foundation/foundation.js"></script>
 		<script src="js/foundation/foundation.slider.js"></script>
 		
-		<div id="slider">
-			<input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
-			<span class="highlight"></span>
-			<output id="rangevalue">2014</output>
-		</div>
-		
 		<script type="text/javascript">
 			var map = null;
 			var lineSymbol = null;
@@ -63,12 +57,17 @@
 				
 				
 				var timeLineUI = document.getElementById('slider');
-				controlDiv.appendChild(timeLineUI);
+				try{
+					//Temporary fix to get the github io to display the page correctly
+					controlDiv.appendChild(timeLineUI);
 				
-				google.maps.event.addDomListener(controlDiv, 'click', function() {
-					/*map.setCenter(heartOfVenice);
-					map.setZoom(14);*/
-				});
+					google.maps.event.addDomListener(controlDiv, 'click', function() {
+						/*map.setCenter(heartOfVenice);
+						map.setZoom(14);*/
+					});
+				} catch (err){
+					
+				}
 			}
 			
 			function createPathPolyline(path, color) {
@@ -145,6 +144,11 @@
 		</script>
 	</head>
 	<body>
+		<div id="slider">
+			<input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
+			<span class="highlight"></span>
+			<output id="rangevalue">2014</output>
+		</div>
 		<div id="map-canvas"></div>
 	</body>
 </html>
