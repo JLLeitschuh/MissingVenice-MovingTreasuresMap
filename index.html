@@ -13,6 +13,13 @@
 		<script src="js/vendor/jquery.js"></script>
 		<script src="js/foundation/foundation.js"></script>
 		<script src="js/foundation/foundation.slider.js"></script>
+		
+		<div id="slider">
+			<input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
+			<span class="highlight"></span>
+			<output id="rangevalue">2014</output>
+		</div>
+		
 		<script type="text/javascript">
 			var map = null;
 			var lineSymbol = null;
@@ -139,10 +146,5 @@
 	</head>
 	<body>
 		<div id="map-canvas"></div>
-		<div id="slider">
-			<input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
-			<span class="highlight"></span>
-			<output id="rangevalue">2014</output>
-		</div>
 	</body>
 </html>
