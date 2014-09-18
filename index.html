@@ -91,17 +91,13 @@
 				timeLineUI.appendChild(timeLineOutput);
 				
 				
-				try{
-					//Temporary fix to get the github io to display the page correctly
-					controlDiv.appendChild(timeLineUI);
-				
-					google.maps.event.addDomListener(controlDiv, 'click', function() {
-						/*map.setCenter(heartOfVenice);
-						map.setZoom(14);*/
-					});
-				} catch (err){
-					console.log(err);
-				}
+				//Temporary fix to get the github io to display the page correctly
+				controlDiv.appendChild(timeLineUI);
+			
+				google.maps.event.addDomListener(controlDiv, 'click', function() {
+					/*map.setCenter(heartOfVenice);
+					map.setZoom(14);*/
+				});
 			}
 			
 			function createPathPolyline(path, color) {
@@ -117,6 +113,18 @@
 						offset: '100%'
 					}]
 				});
+			}
+			
+			function addMarker(path){
+				var arrayLength = path.length;
+				for(var i = 0; i < arrayLength; i++){
+					var marker = new google.maps.Marker({
+						position: path[i],
+						map: map,
+						animation: google.maps.Animation.DROP,
+						title: "Test title"
+					});
+				}
 			}
 			
 			function initialize() {
@@ -148,6 +156,7 @@
 				map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(timelineControlDiv);
 				// END TIMELINE
 				
+				
 				// DATA FOR THE INDIVIDUAL PEICES OF ART
 				var bronzeHorsePath = [
 					new google.maps.LatLng(41.0148235,28.977071),
@@ -166,12 +175,16 @@
 					strokeColor: '#FF0000',
 					strokeOpacity: 1.0
 				};
+				
 
 				var bronzeline = createPathPolyline(bronzeHorsePath, "#800000");
 				var rosaryline = createPathPolyline(feastOfTheRosaryPath, "#FF3300");
 				
 				rosaryline.setMap(map);
 				bronzeline.setMap(map);
+				
+				addMarker(bronzeHorsePath);
+				addMarker(feastOfTheRosaryPath);
 			}
 
 			google.maps.event.addDomListener(window, 'load', initialize);
