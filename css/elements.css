@@ -3,7 +3,12 @@
 	width: 400px;
 	height: 17px;
 	position: relative;
-	margin: 100px auto;
+	
+	/*
+	 * This is what determines how close to the bottom edge
+	 * of the map the slider appears.
+	 */
+	margin-bottom: 15px;
 	background: #10171D;
 	
 	-webkit-border-radius: 40px;
