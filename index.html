@@ -52,13 +52,6 @@
 					map.setZoom(14);
 				});
 			}
-			/**
-			 *<!--div id="slider">
-			 *	 <input class="bar" type="range" name="dates" min="500" max="2014" id="rangeinput" value="2014" onchange="rangevalue.value=value"/>
-			 *	 <span class="highlight"></span>
-			 *	 <output id="rangevalue">2014</output>
-			 *</div-->
-			*/
 			
 			function TimeLineSlider(controlDiv, map){
 				
@@ -68,6 +61,7 @@
 				var timeLineInput = document.createElement('input');
 				
 				// This is declared here so that it can be used in the 'onchange' funciton callback
+				
 				var timeLineOutput = document.createElement('output');
 				
 				timeLineInput.className = 'bar';
@@ -81,7 +75,8 @@
 					timeLineOutput.value = timeLineInput.value;
 				};
 				timeLineUI.appendChild(timeLineInput);
-
+				
+				
 				var timeLineSpan = document.createElement('span');
 				timeLineSpan.className = 'highlight';
 				timeLineUI.appendChild(timeLineSpan);
@@ -100,9 +95,9 @@
 				});
 			}
 			
-			function createPathPolyline(path, color) {
+			function createPathPolyline(element, color) {
 				return new google.maps.Polyline({
-					path: path,
+					path: element.path.map(function(x){return x.loc.cords;}),
 					strokeColor: color,
 					strokeOpacity: 0.5,
 					strokeWeight: 2,
@@ -115,17 +110,95 @@
 				});
 			}
 			
-			function addMarker(path){
-				var arrayLength = path.length;
-				for(var i = 0; i < arrayLength; i++){
-					var marker = new google.maps.Marker({
-						position: path[i],
-						map: map,
-						animation: google.maps.Animation.DROP,
-						title: "Test title"
+			
+			
+			var infoWindowDataPlaced = [];
+			var infoWindows = [];
+			function addMarker(elements, map){
+				 function InfoWindowData(){
+					//The list of art peices
+					this.data =[];
+					this.location = null;
+					this.addData = function(newdata){
+						this.data[this.data.length] = newdata;
+						//if(this.location == null){
+							this.location = newdata.loc;
+						//}
+					};
+					//Constructs the header for the Info Window
+					this.getContentString = function(){
+						var content =
+						'<div id="content">'+
+							'<div id="siteNotice"></div>' +
+							'<h1 id="firstHeading" class="firstHeading">' + this.location.name + '</h1>';
+						for(var i = 0; i < this.data.length; i++){
+							content += '<h2 id="secondHeading" class="secondHeading">'+ this.data[i].name +'</h2>'+
+							'<p>' + this.data[i].description + '</p>';
+						}
+						
+						content +=
+							'</div>'+
+						'</div>';
+						return content;
+					};
+					this.marker= null;
+					this.infoWindow= null;
+				};
+				
+				function addForLocation(infoData){
+					infoData.marker = new google.maps.Marker({
+							position: infoData.location.cords,
+							map: map,
+							animation: google.maps.Animation.DROP,
+							title: "Test title " + infoData.name + ""
 					});
+					
+					var contentString = infoData.getContentString();
+					
+					infoData.infoWindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					infoWindows[infoWindows.length] = infoData.infoWindow;
+					google.maps.event.addListener(infoData.marker, 'click', function() {
+						var arrayLength = infoWindows.length;
+						for(var i = 0; i < arrayLength; i++){
+							if(infoWindows[i] != infoData.infoWindow){
+								infoWindows[i].close();
+							} else {
+								infoWindows[i].open(map, infoData.marker);
+							}
+						}
+						
+					});
+				};
+				
+				//Iterate over all locations this element was located
+				var arrayLength = elements.path.length;
+				for(var i = 0; i < arrayLength; i++){
+					var infoData = null;
+					//Check to see if there is a matching location
+					for(var j = 0; j < infoWindowDataPlaced.length; j++){
+						if(infoWindowDataPlaced[j].location.name == elements.path[i].loc.name){
+							infoData = infoWindowDataPlaced[j];
+							infoData.addData(elements.path[i]);
+							//console.log("Detected");
+							break;
+						}else {
+							//console.log("equality not detected " + infoWindowDataPlaced[j].location.name + " and " + elements.path[i].loc.name);
+						}
+					}
+					//If not create a new one
+					if(infoData == null){
+						infoData = new InfoWindowData();
+						infoData.addData(elements.path[i]);
+						addForLocation(infoData);
+						infoWindowDataPlaced[infoWindowDataPlaced.length] = infoData;
+					}
+					infoData.infoWindow.content=infoData.getContentString();
 				}
+				
 			}
+			
 			
 			function initialize() {
 				var myOptions = {
@@ -156,19 +229,43 @@
 				map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(timelineControlDiv);
 				// END TIMELINE
 				
+				function getLocationByName(name){
+					var locations = [
+						{name:"Hippodrome of Constantinople", description:"", cords: new google.maps.LatLng(41.0148235,28.977071)},
+						{name:"St. Mark's Basilica",          description:"", cords: new google.maps.LatLng(45.434805,12.340067)},
+						{name:"Arc de Triomphe du Carrousel", description:"", cords: new google.maps.LatLng(48.873781,2.295026)},
+						{name:"Interior St. Mark's Basilica", description:"", cords: new google.maps.LatLng(45.4345034,12.3400147)},
+						{name:"Calle Bombasei",               description:"", cords: new google.maps.LatLng(45.437731, 12.336229)},
+						{name:"National Gallery in Prague",   description:"", cords: new google.maps.LatLng(50.088003,14.42175)}
+					];
+					var i;
+					for(i = 0; i < locations.length; i++){
+						if(locations[i]["name"] == name){
+							return locations[i];
+						}
+					}
+					throw 'Element not found ' + name;
+				}
 				
 				// DATA FOR THE INDIVIDUAL PEICES OF ART
-				var bronzeHorsePath = [
-					new google.maps.LatLng(41.0148235,28.977071),
-					new google.maps.LatLng(45.434805,12.340067),
-					new google.maps.LatLng(48.873781,2.295026),
-					new google.maps.LatLng(45.4345034,12.3400147)
-				];
+				var bronzeHorse = {
+					peiceName: "Horses of saint marks",
+					path: [
+						{name: "Horses of Saint Mark",   description:"Origin", loc: getLocationByName("Hippodrome of Constantinople")},
+						{name: "Horses of Saint Mark",   description:"Stolen by the Venetians.", loc: getLocationByName("St. Mark's Basilica")},
+						{name: "Horses of Saint Mark",   description:"Stolen by the Napolean.", loc: getLocationByName("Arc de Triomphe du Carrousel")},
+						{name: "Horses of Saint Mark",   description:"Returned by France",      loc: getLocationByName("St. Mark's Basilica")},
+						{name: "Horses of Saint Mark",   description:"Moved to preseve from polution",      loc: getLocationByName("Interior St. Mark's Basilica")}
+					]
+				};
 
-				var feastOfTheRosaryPath = [
-					new google.maps.LatLng(45.437731, 12.336229),
-					new google.maps.LatLng(50.088003,14.42175)
-				];
+				var feastOfTheRosary = {
+					peiceName: "Feast Of the Rosary",
+					path: [
+						{name: "Feast Of the Rosary", description:"", loc: getLocationByName("Calle Bombasei")},
+						{name: "Feast Of the Rosary", description:"", loc: getLocationByName("National Gallery in Prague")}
+					]
+				};
 				
 				this.lineSymbol = {
 					path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
@@ -177,20 +274,20 @@
 				};
 				
 
-				var bronzeline = createPathPolyline(bronzeHorsePath, "#800000");
-				var rosaryline = createPathPolyline(feastOfTheRosaryPath, "#FF3300");
+				var bronzeline = createPathPolyline(bronzeHorse, "#800000");
+				var rosaryline = createPathPolyline(feastOfTheRosary, "#FF3300");
 				
 				rosaryline.setMap(map);
 				bronzeline.setMap(map);
 				
-				addMarker(bronzeHorsePath);
-				addMarker(feastOfTheRosaryPath);
+				addMarker(bronzeHorse, map);
+				addMarker(feastOfTheRosary, map);
 			}
 
 			google.maps.event.addDomListener(window, 'load', initialize);
 		</script>
 	</head>
 	<body>
-		<div id="map-canvas"></div>
+		<div id="map-canvas" z-index:3></div>
 	</body>
 </html>
